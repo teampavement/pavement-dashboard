@@ -1,0 +1,32 @@
+{
+  "name": "pavement-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "isomorphic-fetch": "^2.2.1",
+    "lucid-ui": "^2.32.5",
+    "moment": "^2.22.0",
+    "react": "^16.2.0",
+    "react-datepicker": "^1.4.0",
+    "react-dom": "^16.2.0",
+    "react-leaflet": "^1.9.1",
+    "react-scripts": "1.1.1",
+    "styled-components": "^3.2.3",
+    "victory": "^0.25.6"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "storybook": "start-storybook -p 9009 -s public",
+    "build-storybook": "build-storybook -s public"
+  },
+  "devDependencies": {
+    "@storybook/react": "^3.3.14",
+    "@storybook/addon-actions": "^3.3.14",
+    "@storybook/addon-links": "^3.3.14",
+    "@storybook/addons": "^3.3.14",
+    "babel-core": "^6.26.0"
+  }
+}

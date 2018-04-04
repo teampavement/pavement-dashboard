@@ -1,0 +1,13 @@
+export default {
+  BLUE: "#586BA4",
+  ORANGE: "#F68E5F",
+  BRIGHT_YELLOW: "#F4E04D",
+  MEDIUM_YELLOW: "#F5DD90",
+  TAN: "#F5E0B7",
+  BEIGE: "#FAF3DD",
+  WHITE: "#FFFFFA",
+  GREY: "#EBE9E9",
+  DARK_GREY: "#4A4A4A",
+  RED: "#F76C5E",
+  GREEN: "#C5E6A6",
+};

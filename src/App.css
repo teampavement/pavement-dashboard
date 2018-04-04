@@ -1,0 +1,177 @@
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  overflow-x: hidden;
+}
+
+.PV-Container {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  height: 100vh;
+}
+
+.PV-Header {
+  flex: 0 0 100%;
+  height: 66px;
+  background-color: #4A4A4A;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  color: #F4E04D;
+}
+
+.logo {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.nav-buttons {
+  display: table;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 100%;
+  align-items: center;
+}
+.nav-button {
+  cursor: pointer;
+  display: table-cell;
+  min-width: 75px;
+  font-size: 24px;
+  padding: 15px;
+  height: 100%;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.nav-button:hover {
+  background-color: #F4E04D;
+  color: #4A4A4A;
+}
+
+.PV-map {
+  height: calc(100% - 66px);
+  width: 55%;
+}
+
+.PV-Right-Panel {
+  height: calc(100% - 66px);
+  /* overflow: scroll; */
+  width: 45%;
+  background: #FFFFFA;
+  display: flex;
+  flex-direction: column;
+}
+
+.PV-Chart {
+  padding-top: 10px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+}
+
+.PV-Chart-Builder {
+  box-shadow: -5px 1px 7px #4a4a4a;
+  background-color: #FFFFFA;
+  z-index: 100;
+  position: relative;
+}
+
+.PV-Chart-Chooser {
+  width: 100%;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+.PV-Chart-Chooser > * {
+  color: #4A4A4A;
+}
+
+.PV-Chart-Chooser > .lucid-Tabs-bar {
+  border-color: #EBE9E9;
+}
+
+.PV-Chart-Option > * {
+  color: #4A4A4A;
+}
+
+.PV-Chart-Option.lucid-Tabs-Tab-is-active-and-open {
+  border-bottom: 1px solid #FFFFFA;
+}
+
+.PV-Chart-Option.lucid-Tabs-Tab-is-active {
+  background-image: linear-gradient(to bottom, #F5DD90 0, #F5DD90 6px, #FFFFFA 3px);
+}
+
+.PV-Chart-Date-Time-Picker {
+  width: 100%;
+  /* min-height: 60px; */
+  margin: 0 auto;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #EBE9E9;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.PV-Chart-Date-Time-Picker-Half {
+
+}
+
+.PV-Chart-Date-Picker {
+  width: 100%;
+}
+/* .PV-Chart-Date-Picker.lucid-TextField:focus {
+  border-color: #F5DD90;
+  box-shadow: 0 0 0 3px rgba(245, 221, 144, 0.3)
+} */
+
+.PV-Chart-Time-Picker {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.PV-Chart-Builder-Footer {
+  border-top: 1px solid #EBE9E9;
+  min-height: 50px;
+}
+
+.PV-Save-Button {
+  background-color: #C5E6A6;
+  float: right;
+  margin: 10px;
+  padding: 0;
+  max-height: 40px;
+  border: 3px solid #C5E6A6;
+  box-shadow: 0px 1px 3px #4A4A4A;
+  color: #4A4A4A;
+  font-size: 18px;
+  cursor: pointer;
+}
+.PV-Save-Button:hover {
+  box-shadow: 0px 1px 5px #4A4A4A;
+  background-color: #C5E6A6;
+}
+.PV-Save-Button:focus {
+  outline: 0;
+}
+.PV-Save-Button:active {
+  box-shadow: 0px 1px 3px #4A4A4A;
+}
+
+.PV-Chart-List {
+  overflow: scroll;
+  list-style: none;
+  padding-left: 0px;
+  padding-top: 20px;
+  margin: 0;
+  top: 10px;
+}
