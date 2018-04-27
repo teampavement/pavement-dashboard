@@ -16,9 +16,10 @@ class ChartPanel extends Component {
             startDate={this.props.startDate}
             endDate={this.props.endDate}
             isLoadingChartData={this.props.isLoadingChartData}
+            handleChartSaved={this.props.handleChartSaved}
           />
           <ChartList
-            savedCharts={[]}
+            chartList={this.props.chartList}
           />
       </div>
     );

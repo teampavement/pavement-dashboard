@@ -1,4 +1,4 @@
-import fetch from 'isomorphic-fetch'
+// import fetch from 'isomorphic-fetch'
 
 const API_URL = `http://127.0.0.1:5000`;
 
@@ -18,9 +18,10 @@ const getRequestURLBuilder = (body) => {
   return API_URL + '?' + paramStringBuilder(body);
 };
 
-export default (endpoint, method, body) => {
+export default (endpoint, method, body, signal) => {
   if (method === 'POST') {
     return fetch(`${API_URL}/${endpoint}`, {
+      signal,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

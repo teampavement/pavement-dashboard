@@ -33,7 +33,7 @@ class ChartBuilder extends Component {
           isLoadingChartData={this.props.isLoadingChartData}
         />
         <div className="PV-Chart-Builder-Footer">
-          <button className="PV-Save-Button">Save chart</button>
+          <button className="PV-Save-Button" onClick={this.props.handleChartSaved}>Save chart</button>
         </div>
       </div>
     );

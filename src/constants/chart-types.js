@@ -5,7 +5,7 @@ export const ChartTypes = [
 ];
 
 export const ChartAxes = {
-  'parking-occupancy': 'Parking Occupancy (#)',
-  'parking-revenue': 'Parking Revenue ($)',
-  'parking-time': 'Parking Time',
+  'parking-occupancy': '# of spaces occupied',
+  'parking-revenue': 'amount paid for parking (in $)',
+  'parking-time': 'time parked (in seconds)',
 }

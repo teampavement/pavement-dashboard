@@ -31,19 +31,26 @@ const data = [
 	{ timestamp: new Date(2018, 1, 1, 22), value: 7 },
 	{ timestamp: new Date(2018, 1, 1, 23), value: 7 },
 ];
-const xAxisField = ['timestamp'];
+const xAxisField = 'timestamp';
 const yAxisFields = ['value'];
 
 class Chart extends Component {
 	render() {
 		return (
 			<LoadingIndicator isLoading={this.props.isLoadingChartData} className="PV-Chart">
+				{
+					this.props.startDate &&
+					<div>
+						From {this.props.startDate.format("MM/DD/YYYY")} to {this.props.endDate.format("MM/DD/YYYY")}
+					</div>
+				}
+
 				<Resizer>
 					{(width) => (
 						<LineChart
 							width={width}
 							height={300}
-							data={this.props.chartData ? this.props.chartData : data}
+							data={this.props.chartData ? this.props.chartData : []}
 							xAxisField={xAxisField}
 							yAxisFields={yAxisFields}
 							yAxisTitle={ChartAxes[this.props.selectedChartType]}

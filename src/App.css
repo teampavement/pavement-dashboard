@@ -10,6 +10,10 @@ body {
   overflow-x: hidden;
 }
 
+.sr-only {
+   display: none;
+}
+
 .PV-Container {
   display: flex;
   flex-wrap: wrap;
