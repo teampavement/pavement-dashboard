@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import DatePicker from 'react-datepicker';
 
+import { ButtonGroup } from 'lucid-ui';
+
 import 'react-datepicker/dist/react-datepicker.css';
 
 class ChartDateTimePicker extends Component {
@@ -11,8 +13,9 @@ class ChartDateTimePicker extends Component {
   render() {
     return (
       <div className="PV-Chart-Date-Time-Picker">
-        <div className="PV-Chart-Date-Time-Picker-Half">
-          From
+
+        <div>
+          <span>From</span>
           <DatePicker
             selected={this.props.startDate}
             selectsStart
@@ -21,9 +24,9 @@ class ChartDateTimePicker extends Component {
             onChange={this.props.handleChartStartDateChanged}
           />
 
-          </div>
-        <div className="PV-Chart-Date-Time-Picker-Half">
-          To
+        </div>
+        <div>
+          <span>To</span>
           <DatePicker
             selected={this.props.endDate}
             selectsEnd
@@ -32,6 +35,12 @@ class ChartDateTimePicker extends Component {
             onChange={this.props.handleChartEndDateChanged}
           />
         </div>
+
+        {/* <ButtonGroup>
+          <ButtonGroup.Button>F</ButtonGroup.Button>
+          <ButtonGroup.Button>Sa</ButtonGroup.Button>
+          <ButtonGroup.Button>Su</ButtonGroup.Button>
+        </ButtonGroup> */}
       </div>
     );
   }

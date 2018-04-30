@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import L from 'leaflet';
 import ReactDOMServer from 'react-dom/server';
 import {
   Map,
@@ -11,7 +12,11 @@ import {
 } from 'react-leaflet';
 import Control from 'react-leaflet-control';
 import { EditControl } from "react-leaflet-draw"
-import { ToolTipDumb } from 'lucid-ui';
+import {
+  ToolTipDumb,
+  Banner,
+  Button
+} from 'lucid-ui';
 
 import COLORS from '../../constants/colors';
 import Chart from '../chart';
@@ -116,32 +121,31 @@ class MapComponent extends Component {
                  }}
         />
         <Control position="bottomleft">
-          <button className="PV-show-spaces"
+          <Button className="PV-Map-Control-Button"
             onClick={this.props.handleToggleShowSpaces}>
-            Show spaces for selected curbs
-          </button>
+            {this.props.showSpaces ? 'Show curbs' : 'Show spaces'}
+          </Button>
         </Control>
         <Control position="bottomleft">
-          <button className="PV-show-spaces"
+          <Button className="PV-Map-Control-Button"
             onClick={this.props.handleSelectAllCurbs}>
             Select all curbs
-          </button>
+          </Button>
         </Control>
-        {/* <FeatureGroup>
+        <FeatureGroup>
           <EditControl
-            position='topright'
+            position='topleft'
             onEdited={this._onEditPath}
             onCreated={this._onCreate}
             onDeleted={this._onDeleted}
             draw={{
-              rectangle: false,
               marker: false,
+              circle: false,
               circlemarker: false,
-              polyline: false,
             }}
             onDrawStop={this.props.handleDrawStop}
           />
-        </FeatureGroup> */}
+        </FeatureGroup>
           {/* <Circle center={[51.51, -0.06]} radius={200} /> */}
         {/* <HeatmapLayer
             fitBoundsOnLoad

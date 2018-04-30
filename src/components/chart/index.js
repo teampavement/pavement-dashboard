@@ -3,7 +3,7 @@ import { Resizer, LineChart, Legend, chartConstants, LoadingIndicator } from 'lu
 import '../../../node_modules/lucid-ui/dist/index.css';
 
 import COLORS from '../../constants/colors';
-import {ChartAxes} from '../../constants/chart-types';
+import {ChartAxes, ChartTitles} from '../../constants/chart-types';
 
 const data = [
 	{ timestamp: new Date("2018-02-01T05:00:00.000Z"), value: 2 },
@@ -39,7 +39,13 @@ class Chart extends Component {
 		return (
 			<LoadingIndicator isLoading={this.props.isLoadingChartData} className="PV-Chart">
 				{
-					this.props.startDate &&
+					this.props.listView && this.props.selectedChartType &&
+					<div>
+						{ChartTitles[this.props.selectedChartType]}
+					</div>
+				}
+				{
+					this.props.listView && this.props.startDate &&
 					<div>
 						From {this.props.startDate.format("MM/DD/YYYY")} to {this.props.endDate.format("MM/DD/YYYY")}
 					</div>
@@ -61,7 +67,14 @@ class Chart extends Component {
 				)}
 				</Resizer>
 
-				<Legend style={{ verticalAlign: 'bottom' }}>
+				{
+					this.props.listView &&
+					<div className="PV-Chart-Footer">
+						<button className="PV-Save-Button">View</button>
+					</div>
+				}
+
+				{/* <Legend style={{ verticalAlign: 'bottom' }}>
 					{yAxisFields.map((field, i) => {
 						return <Legend.Item
 							key={field}
@@ -73,7 +86,7 @@ class Chart extends Component {
 							{field}
 						</Legend.Item>
 					})}
-				</Legend>
+				</Legend> */}
 			</LoadingIndicator>
 		);
 	}

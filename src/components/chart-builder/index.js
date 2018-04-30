@@ -2,10 +2,20 @@ import React, { Component } from 'react';
 import Chart from '../chart';
 import ChartDateTimePicker from '../chart-datetime-picker';
 import ChartChooser from '../chart-chooser';
+import { Panel } from 'lucid-ui';
 
-import { DateSelect, DropMenu, Button } from 'lucid-ui';
+import {
+  DateSelect,
+  DropMenu,
+  Button,
+  SplitButton,
+  ButtonGroup
+} from 'lucid-ui';
 
-const { Control, Option } = DropMenu;
+const {
+  Control,
+  Option
+} = DropMenu;
 
 class ChartBuilder extends Component {
   constructor(props) {
@@ -16,10 +26,6 @@ class ChartBuilder extends Component {
   render() {
     return (
       <div className="PV-Chart-Builder">
-        <ChartChooser
-          selectedChartType={this.props.selectedChartType}
-          handleChartTypeChanged={this.props.handleChartTypeChanged}
-        />
         <ChartDateTimePicker
           startDate={this.props.startDate}
           endDate={this.props.endDate}
@@ -32,8 +38,13 @@ class ChartBuilder extends Component {
           chartData={this.props.chartData}
           isLoadingChartData={this.props.isLoadingChartData}
         />
-        <div className="PV-Chart-Builder-Footer">
-          <button className="PV-Save-Button" onClick={this.props.handleChartSaved}>Save chart</button>
+        <div className="PV-Chart-Footer">
+          {/* <button className="PV-Save-Button" onClick={this.props.handleChartSaved}>Add new chart</button> */}
+          <ChartChooser
+            selectedChartType={this.props.selectedChartType}
+            handleChartTypeChanged={this.props.handleChartTypeChanged}
+          />
+          <Button className='PV-Right-Button'>Export chart and map</Button>
         </div>
       </div>
     );

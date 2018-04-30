@@ -9,3 +9,9 @@ export const ChartAxes = {
   'parking-revenue': 'amount paid for parking (in $)',
   'parking-time': 'time parked (in seconds)',
 }
+
+export const ChartTitles = {
+  'parking-occupancy': 'Occupancy',
+  'parking-revenue': 'Revenue',
+  'parking-time': 'Time',
+}

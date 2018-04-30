@@ -10,15 +10,35 @@ body {
   overflow-x: hidden;
 }
 
+.lucid-ExpanderPanel-icon > .lucid-ChevronIcon {
+  fill: #4A4A4A;
+}
+
 .sr-only {
    display: none;
 }
 
 .PV-Container {
-  display: flex;
+  /* display: flex;
   flex-wrap: wrap;
-  flex-direction: row;
+  flex-direction: row; */
   height: 100vh;
+  position:relative;
+}
+
+.PV-Banner-Container {
+  z-index: 999;
+  float: left;
+  position: absolute;
+  top: 100px;
+  left: 50%;
+}
+
+.PV-Banner {
+  float: left;
+  position: relative;
+  left: -50%;
+  font-size: 18px;
 }
 
 .PV-Header {
@@ -30,6 +50,8 @@ body {
   justify-content: space-between;
   align-items: center;
   color: #F4E04D;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .logo {
@@ -62,16 +84,15 @@ body {
 
 .PV-map {
   height: calc(100% - 66px);
-  width: 55%;
+  /* width: 55%; */
 }
 
-.PV-Right-Panel {
-  height: calc(100% - 66px);
-  /* overflow: scroll; */
-  width: 45%;
-  background: #FFFFFA;
-  display: flex;
-  flex-direction: column;
+.PV-Map-Control-Button.lucid-Button {
+  /* border-color: #FFF; */
+  font-size: 18px;
+  background-image: linear-gradient(#FFFFFA,#EBE9E9);
+  width: 160px;
+  border-color: #4A4A4A;
 }
 
 .PV-Chart {
@@ -81,10 +102,7 @@ body {
 }
 
 .PV-Chart-Builder {
-  box-shadow: -5px 1px 7px #4a4a4a;
-  background-color: #FFFFFA;
-  z-index: 100;
-  position: relative;
+  min-width: 750px;
 }
 
 .PV-Chart-Chooser {
@@ -143,32 +161,31 @@ body {
   justify-content: space-evenly;
 }
 
-.PV-Chart-Builder-Footer {
+.PV-Chart-Footer {
   border-top: 1px solid #EBE9E9;
   min-height: 50px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
-.PV-Save-Button {
-  background-color: #C5E6A6;
-  float: right;
+.PV-Chart-Footer-Left-Button {
   margin: 10px;
   padding: 0;
-  max-height: 40px;
-  border: 3px solid #C5E6A6;
-  box-shadow: 0px 1px 3px #4A4A4A;
+}
+
+.PV-Chart-Footer-Left-Button > .lucid-Button,
+.PV-Chart-Footer-Left-Button > .lucid-Button.lucid-Button-is-active
+ {
+  background-color: #F5E0B7;
+  border-color: #4A4A4A;
   color: #4A4A4A;
-  font-size: 18px;
-  cursor: pointer;
 }
-.PV-Save-Button:hover {
-  box-shadow: 0px 1px 5px #4A4A4A;
-  background-color: #C5E6A6;
-}
-.PV-Save-Button:focus {
-  outline: 0;
-}
-.PV-Save-Button:active {
-  box-shadow: 0px 1px 3px #4A4A4A;
+
+.PV-Right-Button.lucid-Button {
+  margin: 10px;
+  background-color: #F5E0B7;
+  border-color: #4A4A4A;
 }
 
 .PV-Chart-List {

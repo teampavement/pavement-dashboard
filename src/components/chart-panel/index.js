@@ -1,11 +1,30 @@
 import React, { Component } from 'react';
+import { ExpanderPanel } from 'lucid-ui';
+
+import {ChartTitles} from '../../constants/chart-types';
 import ChartBuilder from '../chart-builder';
 import ChartList from '../chart-list';
 
 class ChartPanel extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      isChartBuilderExpanded: true
+    };
+  }
+
   render() {
     return (
-      <div className="PV-Right-Panel">
+      <ExpanderPanel className='PV-Chart-Panel' hasPadding={false} style={{
+        zIndex: 400,
+        position: 'absolute',
+        top: 90,
+        right: 10,
+        maxHeight: '80vh',
+        borderColor: '#4A4A4A'
+      }}>
+        <ExpanderPanel.Header>Chart Builder — {ChartTitles[this.props.selectedChartType]}</ExpanderPanel.Header>
           <ChartBuilder
             selectedParkingSpaces={this.props.selectedParkingSpaces}
             chartData={this.props.chartData}
@@ -18,10 +37,11 @@ class ChartPanel extends Component {
             isLoadingChartData={this.props.isLoadingChartData}
             handleChartSaved={this.props.handleChartSaved}
           />
+          {/* <hr />
           <ChartList
             chartList={this.props.chartList}
-          />
-      </div>
+          /> */}
+      </ExpanderPanel>
     );
   }
 }

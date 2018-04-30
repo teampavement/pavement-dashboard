@@ -3,10 +3,12 @@ import './App.css';
 import moment from 'moment';
 import L from 'leaflet';
 import booleanContains from '@turf/boolean-contains';
+
 import api from './utils/api';
 import {chartModelFromState, chartModelToState} from './models/chart';
 
 import MapComponent from './components/map';
+import Alert from './components/alert';
 import Header from './components/header';
 import ChartPanel from './components/chart-panel';
 
@@ -61,6 +63,8 @@ class App extends Component {
       endDate: moment('2017-8-4'),
       isLoadingChartData: false,
       chartList: [],
+      showBanner: false,
+      bannerMessage: '',
     }
   }
 
@@ -142,7 +146,32 @@ class App extends Component {
     // });
   }
 
+  handleShowBanner(message, duration) {
+    if (!duration) {
+      duration = 5000;
+    }
+    // set bannerMessage
+    // show banner
+    this.setState({
+      showBanner: true,
+      bannerMessage: message
+    });
+
+    // setTimeout, hide banner
+    setTimeout(() => {
+      this.setState({
+        showBanner: false,
+        bannerMessage: ''
+      })
+    }, duration);
+  }
+
   handleSelectAllCurbs() {
+    if (this.state.showSpaces) {
+      // noop if viewing spaces
+      return;
+    }
+
     this.setState({
       selectedParkingSpaces: allSpaces,
       selectedCurbs: allCurbs,
@@ -151,6 +180,13 @@ class App extends Component {
   }
 
   handleToggleShowSpaces() {
+    // hard limit of 500 spaces
+    if (this.state.selectedParkingSpaces.length > 500) {
+      this.handleShowBanner('Sorry, you can\'t do that right now 😢 We can only show 500 individual spaces, or else things get very slow. ' +
+      'Please select fewer curbs and try again?', 10000)
+      return;
+    }
+
     // if toggle off, just revert to original
     let newGeoJsonData = Object.assign({}, APData);
     if (!this.state.showSpaces && this.state.selectedParkingSpaces.length > 0) {
@@ -163,6 +199,12 @@ class App extends Component {
         return this.state.selectedParkingSpaces.indexOf(feature.properties.spacename) > 0;
       });
 
+      if (selectedSpacesFeatures.length < 1) {
+        this.handleShowBanner('Whoops, couldn\'t find any associated spaces for the curb/curbs you selected. ' +
+        'Select some new curbs and try again?');
+        return;
+      }
+
       newGeoJsonData.features = newGeoJsonData.features.concat(selectedSpacesFeatures);
     }
     // change geojsonData state
@@ -173,6 +215,10 @@ class App extends Component {
   }
 
   handleCurbSelected(curb) {
+    if (this.state.showSpaces) {
+      // noop if viewing spaces
+      return;
+    }
     // if all selected, deselect all and add the selected curb to selected list
     console.log(curb);
     let newSelectedCurbs = this.state.selectedCurbs;
@@ -211,25 +257,25 @@ class App extends Component {
         chartData: {},
       },
       () => {
-        //get api model
-        let chartModel = chartModelFromState(this.state);
-
-        //api call
-        api(this.state.selectedChartType, 'POST', chartModel)
-        .then((response) => {
-          //set state
-          return response.json();
-        })
-        .then((payload) => {
-          let newChartData = chartModelToState(payload.data);
-          this.setState({
-            chartApiResponseData: payload,
-            chartData: newChartData,
-            isLoadingChartData: false,
-          });
-        })
-        .catch((e) => {
-        });
+        // //get api model
+        // let chartModel = chartModelFromState(this.state);
+        //
+        // //api call
+        // api(this.state.selectedChartType, 'POST', chartModel)
+        // .then((response) => {
+        //   //set state
+        //   return response.json();
+        // })
+        // .then((payload) => {
+        //   let newChartData = chartModelToState(payload.data);
+        //   this.setState({
+        //     chartApiResponseData: payload,
+        //     chartData: newChartData,
+        //     isLoadingChartData: false,
+        //   });
+        // })
+        // .catch((e) => {
+        // });
       }
     );
   }
@@ -309,6 +355,10 @@ class App extends Component {
     return (
       <div className="PV-Container">
         <Header />
+        <Alert
+          isClosed={!this.state.showBanner}
+          message={this.state.bannerMessage}
+        />
         <MapComponent
           geojsonData={this.state.geojsonData}
           selectedCurbs={this.state.selectedCurbs}
@@ -317,6 +367,7 @@ class App extends Component {
           handleCurbSelected={this.handleCurbSelected}
           handleSelectAllCurbs={this.handleSelectAllCurbs}
           handleToggleShowSpaces={this.handleToggleShowSpaces}
+          showSpaces={this.state.showSpaces}
         />
         <ChartPanel
           selectedParkingSpaces={this.state.selectedParkingSpaces}
