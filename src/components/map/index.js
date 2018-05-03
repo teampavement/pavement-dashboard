@@ -4,6 +4,7 @@ import ReactDOMServer from 'react-dom/server';
 import {
   Map,
   Marker,
+  CircleMarker,
   Popup,
   TileLayer,
   GeoJSON,
@@ -15,14 +16,19 @@ import { EditControl } from "react-leaflet-draw"
 import {
   ToolTipDumb,
   Banner,
-  Button
+  Button,
+  LoadingIndicator
 } from 'lucid-ui';
 
 import COLORS from '../../constants/colors';
 import Chart from '../chart';
+import {
+  getLatitudeFromCurb,
+  getLongitudeFromCurb
+} from '../../utils/heatmap';
 
 // import GeoJsonCluster from 'react-leaflet-geojson-cluster';
-// import HeatmapLayer from 'react-leaflet-heatmap-layer';
+import HeatmapLayer from 'react-leaflet-heatmap-layer';
 
 const DEFAULT_CENTER = {
   lat: 40.220121,
@@ -59,6 +65,8 @@ class MapComponent extends Component {
     this.handleCurbClick = this.handleCurbClick.bind(this);
     this.handleCurbClick = this.handleCurbClick.bind(this);
     this.generateKey = this.generateKey.bind(this);
+    this.heatmapIntensityExtractor = this.heatmapIntensityExtractor.bind(this);
+    this.generateCircleMarker = this.generateCircleMarker.bind(this);
   }
 
   getStyle(geoJsonFeature) {
@@ -73,27 +81,68 @@ class MapComponent extends Component {
   }
 
   handleCurbClick(e) {
-    this.props.handleCurbSelected(e.target.feature);
+    if (e.target.feature.geometry.type !== 'MultiPoint') {
+      this.props.handleCurbSelected(e.target.feature);
+    }
   }
 
   handleCurbMouseout(e) {
-    this.setStyle({
-      "weight": 3
-    });
+    if (e.target.feature.geometry.type !== 'MultiPoint') {
+      this.setStyle({
+        "weight": 3
+      });
+    }
   }
 
   handleCurbMouseover(e) {
     // mouseover for 650ms
     // must be selected
     // console.log(e.target.feature.properties.spaces);
-    this.setStyle({
-      "weight": 9
-    });
+    if (e.target.feature.geometry.type !== 'MultiPoint') {
+      this.setStyle({
+        "weight": 9
+      });
+    }
   }
 
   generateKey(obj) {
     const objJsonStr = JSON.stringify(obj);
     return Buffer.from(objJsonStr).toString("base64");
+  }
+
+  heatmapIntensityExtractor(marker) {
+
+  }
+
+  generateCircleMarker(point, latlng) {
+    // find the right color
+    const len = this.props.heatmapValues.length;
+    const per20 = this.props.heatmapValues[Math.floor(len*.2) - 1];
+    const per40 = this.props.heatmapValues[Math.floor(len*.4) - 1];
+    const per60 = this.props.heatmapValues[Math.floor(len*.6) - 1];
+    const per80 = this.props.heatmapValues[Math.floor(len*.8) - 1];
+
+    let circleColor;
+    if (point.properties.heatmapValue <= per20) {
+      circleColor = COLORS.BLUE;
+    } else if (point.properties.heatmapValue <= per40) {
+      circleColor = COLORS.GREEN;
+    } else if (point.properties.heatmapValue <= per60) {
+      circleColor = COLORS.BRIGHT_YELLOW;
+    } else if (point.properties.heatmapValue <= per80) {
+      circleColor = COLORS.ORANGE;
+    } else if (point.properties.heatmapValue > per80) {
+      circleColor = COLORS.RED;
+    }
+
+    return L.circleMarker(latlng, {
+      radius: 4,
+      fillColor: circleColor,
+      fillOpacity: 1,
+      borderColor: circleColor,
+      weight: 2,
+      opacity: 0.6,
+    });
   }
 
   render() {
@@ -103,6 +152,7 @@ class MapComponent extends Component {
         ref="map"
         className="PV-map"
         draggable={true}
+        preferCanvas={true}
         viewport={DEFAULT_VIEWPORT}>
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -111,8 +161,8 @@ class MapComponent extends Component {
         <GeoJSON key={this.generateKey(this.props.geojsonData)}
                  data={this.props.geojsonData}
                  style={this.getStyle}
+                 pointToLayer={this.generateCircleMarker}
                  onEachFeature={(feature, layer) => {
-                   // layer.bindPopup('hello');
                    layer.on({
                      click: this.handleCurbClick,
                      mouseover: this.handleCurbMouseover,
@@ -126,12 +176,14 @@ class MapComponent extends Component {
             {this.props.showSpaces ? 'Show curbs' : 'Show spaces'}
           </Button>
         </Control>
+        {!this.props.showSpaces &&
         <Control position="bottomleft">
           <Button className="PV-Map-Control-Button"
             onClick={this.props.handleSelectAllCurbs}>
             Select all curbs
           </Button>
         </Control>
+        }
         <FeatureGroup>
           <EditControl
             position='topleft'
@@ -147,13 +199,18 @@ class MapComponent extends Component {
           />
         </FeatureGroup>
           {/* <Circle center={[51.51, -0.06]} radius={200} /> */}
-        {/* <HeatmapLayer
-            fitBoundsOnLoad
-            fitBoundsOnUpdate
-            points={this.props.geojsonData.features}
-            longitudeExtractor={m => m.geometry.coordinates[0]}
-            latitudeExtractor={m => m.geometry.coordinates[1]}
-            intensityExtractor={this.props.getHeatmapIntensityForSpace} /> */}
+        {this.props.showHeatmap &&
+          <LoadingIndicator isLoading={this.props.isLoadingHeatmapData} >
+            <HeatmapLayer
+              max={this.props.maxHeatmapValue}
+              blur={1}
+              radius={2}
+              points={this.props.heatmapData}
+              latitudeExtractor={m => m[0]}
+              longitudeExtractor={m => m[1]}
+              intensityExtractor={m => m[2]} />
+          </LoadingIndicator>
+          }
       </Map>
     );
   }

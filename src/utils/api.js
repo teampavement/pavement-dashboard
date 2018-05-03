@@ -14,15 +14,31 @@ const paramStringBuilder = (obj) => {
   return output;
 }
 
-const getRequestURLBuilder = (body) => {
-  return API_URL + '?' + paramStringBuilder(body);
+const getRequestURLBuilder = (API_URL, queryParams) => {
+  return API_URL + '/?' + paramStringBuilder(queryParams);
 };
 
-export default (endpoint, method, body, signal) => {
+export default (endpoint, method, body, queryParams) => {
+  let url = `${API_URL}/${endpoint}`;
+  if (queryParams) {
+    url += `?${paramStringBuilder(queryParams)}`;
+  }
+
   if (method === 'POST') {
-    return fetch(`${API_URL}/${endpoint}`, {
-      signal,
+    return fetch(`${url}`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body),
+      credentials: "same-origin"
+    });
+  }
+
+  if (method === 'GET') {
+
+    return fetch(`${url}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       },

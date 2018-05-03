@@ -18,11 +18,6 @@ const {
 } = DropMenu;
 
 class ChartBuilder extends Component {
-  constructor(props) {
-    super(props);
-
-  }
-
   render() {
     return (
       <div className="PV-Chart-Builder">

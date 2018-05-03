@@ -10,7 +10,7 @@ body {
   overflow-x: hidden;
 }
 
-.lucid-ExpanderPanel-icon > .lucid-ChevronIcon {
+.lucid-ExpanderP-icon > .lucid-ChevronIcon {
   fill: #4A4A4A;
 }
 
@@ -95,6 +95,15 @@ body {
   border-color: #4A4A4A;
 }
 
+.lucid-Panel.PV-Chart-Panel {
+  z-index: 400;
+  position: absolute;
+  top: 90px;
+  right: 10px;
+  max-height: 80vh;
+  border-color: #4A4A4A;
+}
+
 .PV-Chart {
   padding-top: 10px;
   padding-bottom: 5px;
@@ -102,7 +111,11 @@ body {
 }
 
 .PV-Chart-Builder {
-  min-width: 750px;
+  width: 750px;
+}
+
+@media screen and (max-width: 1024px) {
+
 }
 
 .PV-Chart-Chooser {

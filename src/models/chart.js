@@ -25,9 +25,9 @@ export const chartModelFromState = (state) => {
 
   return {
     datetime_range: {
-      start: startDate.format(),
-      end: endDate.format(),
+      start: startDate.utc().format(),
+      end: endDate.utc().format(),
     },
-    parking_space: parkingSpaces,
+    parking_spaces: parkingSpaces,
   }
 }

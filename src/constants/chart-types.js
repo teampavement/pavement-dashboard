@@ -1,3 +1,9 @@
+export const ChartTypeMap = {
+  PARKING_OCCUPANCY: 'parking-occupancy',
+  PARKING_REVENUE: 'parking-revenue',
+  PARKING_TIME: 'parking-time',
+}
+
 export const ChartTypes = [
   'parking-occupancy',
   'parking-revenue',
@@ -5,9 +11,9 @@ export const ChartTypes = [
 ];
 
 export const ChartAxes = {
-  'parking-occupancy': '# of spaces occupied',
+  'parking-occupancy': '% of spaces occupied',
   'parking-revenue': 'amount paid for parking (in $)',
-  'parking-time': 'time parked (in seconds)',
+  'parking-time': 'average time parked (in hours)',
 }
 
 export const ChartTitles = {

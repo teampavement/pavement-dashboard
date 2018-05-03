@@ -6,6 +6,7 @@ import booleanContains from '@turf/boolean-contains';
 
 import api from './utils/api';
 import {chartModelFromState, chartModelToState} from './models/chart';
+import {heatmapModelFromState, heatmapModelToState} from './models/heatmap';
 
 import MapComponent from './components/map';
 import Alert from './components/alert';
@@ -23,11 +24,6 @@ const segments = [
 let features = segments.reduce((a,b) => a.concat(b), []);
 
 const allSpaces = [].concat(...(features.map(feature => feature.properties.spaces)));
-// const allSpaces = features.reduce((map, feature) => {
-//     return feature.properties.spaces.reduce((map, space) => {
-//       map[space] = true;
-//     });
-// }, {});
 const allCurbs = features.reduce((map, feature) => {
     map[feature.properties.curbline_id] = true;
     return map;
@@ -49,6 +45,7 @@ class App extends Component {
     this.handleCurbSelected = this.handleCurbSelected.bind(this);
     this.handleSelectAllCurbs = this.handleSelectAllCurbs.bind(this);
     this.handleToggleShowSpaces = this.handleToggleShowSpaces.bind(this);
+    this.handleShowHeatMap = this.handleShowHeatMap.bind(this);
     // this._getHeatmapIntensityForSpace = this._getHeatmapIntensityForSpace.bind(this);
     this.state = {
       selectedChartType: ChartTypes[0],
@@ -57,11 +54,17 @@ class App extends Component {
       maxCurbCount: Object.keys(allCurbs).length,
       geojsonData: APData,
       showSpaces: false,
-      chartData: chartModelToState(initialOccupancy.data),
-      chartApiResponseData: initialOccupancy,
-      startDate: moment('2017-8-1'),
-      endDate: moment('2017-8-4'),
-      isLoadingChartData: false,
+      // chartData: chartModelToState(initialOccupancy.data),
+      // chartApiResponseData: initialOccupancy,
+      chartData: [],
+      chartApiResponseData: null,
+      heatmapData: [],
+      heatmapApiResponseData: null,
+      showHeatmap: false,
+      startDate: moment('2017-8-1 09:00:00'),
+      endDate: moment('2017-8-2 02:00:00'),
+      isLoadingChartData: true,
+      isLoadingHeatmapData: false,
       chartList: [],
       showBanner: false,
       bannerMessage: '',
@@ -125,25 +128,143 @@ class App extends Component {
   }
 
   componentDidMount() {
-    // //get api model
-    // let chartModel = chartModelFromState(this.state);
-    //
-    // //api call
-    // api(this.state.selectedChartType, 'POST', chartModel)
-    // .then((response) => {
-    //   //set state
-    //   return response.json();
-    // })
-    // .then((payload) => {
-    //   let newChartData = chartModelToState(payload.data);
-    //   this.setState({
-    //     chartApiResponseData: payload,
-    //     chartData: newChartData,
-    //     isLoadingChartData: false,
-    //   });
-    // })
-    // .catch((e) => {
-    // });
+    //get api model
+    let chartModel = chartModelFromState(this.state);
+
+    //api call
+    api(this.state.selectedChartType, 'POST', chartModel)
+    .then((response) => {
+      //set state
+      return response.json();
+    })
+    .then((payload) => {
+      let newChartData = chartModelToState(payload.data);
+      this.setState({
+        chartApiResponseData: payload,
+        chartData: newChartData,
+        isLoadingChartData: false,
+      });
+    })
+    .catch((e) => {
+    });
+  }
+  // FOR USE WITH HEATMAP LAYER
+  // handleShowHeatMap() {
+  //   if (this.state.showHeatmap) {
+  //     this.setState({
+  //       showHeatmap: false,
+  //       heatmapData: [],
+  //     });
+  //     return;
+  //   }
+  //   this.setState({
+  //       isLoadingHeatmapData: true,
+  //       heatmapData: [],
+  //       showHeatmap: true,
+  //     },
+  //     () => {
+  //       //TODO - UNCOMMENT
+  //       //get api model
+  //       let heatmapModel = heatmapModelFromState(this.state);
+  //
+  //       //api call
+  //       api(this.state.selectedChartType, 'POST', heatmapModel, {'heatmap': true})
+  //       .then((response) => {
+  //         //set state
+  //         return response.json();
+  //       })
+  //       .then((payload) => {
+  //         let newHeatmapModel = heatmapModelToState(payload.data);
+  //         const maxHeatmapValue = newHeatmapModel.reduce((a, b) => {
+  //           if (Array.isArray(a)) {
+  //             return Math.max(a[2], b[2])
+  //           } else {
+  //             return Math.max(a, b[2])
+  //           }
+  //         });
+  //         this.setState({
+  //           // heatmapApiResponseData: payload,
+  //           heatmapData: newHeatmapModel,
+  //           maxHeatmapValue,
+  //           isLoadingHeatmapData: false,
+  //         });
+  //       })
+  //       .catch((e) => {
+  //       });
+  //     }
+  //   );
+  // }
+
+  handleShowHeatMap() {
+    if (this.state.showHeatmap) {
+      this.setState({
+        showHeatmap: false,
+        heatmapData: [],
+      });
+      return;
+    }
+    this.setState({
+        isLoadingHeatmapData: true,
+        heatmapData: [],
+        showHeatmap: true,
+      },
+      () => {
+        //TODO - UNCOMMENT
+        //get api model
+        let heatmapModel = heatmapModelFromState(this.state);
+
+        //api call
+        api(this.state.selectedChartType, 'POST', heatmapModel, {'heatmap': true})
+        .then((response) => {
+          //set state
+          return response.json();
+        })
+        .then((payload) => {
+          const newHeatmapModel = payload.data;
+          const maxHeatmapValue = newHeatmapModel.reduce((a, b) => {
+            return Math.max(a.value, b.value)
+          }, 0);
+          this.setState({
+            // heatmapApiResponseData: payload,
+            heatmapData: newHeatmapModel,
+            maxHeatmapValue,
+            isLoadingHeatmapData: false,
+          }, () => {
+            // start - change markers
+
+            let newGeoJsonData = Object.assign({}, APData);
+
+            // add in selected spaces
+            let selectedSpacesFeatures = AsburyParkSpaces.features.filter((feature) => {
+              return this.state.selectedParkingSpaces.indexOf(feature.properties.spacename) > 0;
+            });
+
+            // modify selected spaces to include heatmap value
+            selectedSpacesFeatures = selectedSpacesFeatures.map((feature) => {
+              const matched = this.state.heatmapData.find((element) => {
+                return element.space === feature.properties.spacename;
+              });
+
+              if (matched) {
+                let newFeature = feature;
+                newFeature.properties.heatmapValue = matched.value;
+                return newFeature;
+              }
+              return feature;
+            });
+
+            newGeoJsonData.features = newGeoJsonData.features.concat(selectedSpacesFeatures);
+            // change geojsonData state
+            this.setState({
+              geojsonData: newGeoJsonData,
+            });
+            // end - change markers
+          });
+        })
+        .catch((e) => {
+        });
+      }
+    );
   }
 
   handleShowBanner(message, duration) {
@@ -180,38 +301,86 @@ class App extends Component {
   }
 
   handleToggleShowSpaces() {
-    // hard limit of 500 spaces
-    if (this.state.selectedParkingSpaces.length > 500) {
-      this.handleShowBanner('Sorry, you can\'t do that right now 😢 We can only show 500 individual spaces, or else things get very slow. ' +
-      'Please select fewer curbs and try again?', 10000)
+    // if toggle off, just revert to original
+    if (this.state.showSpaces) {
+      let newGeoJsonData = Object.assign({}, APData);
+      // change geojsonData state
+      this.setState({
+        geojsonData: newGeoJsonData,
+        showSpaces: !this.state.showSpaces
+      });
       return;
     }
 
-    // if toggle off, just revert to original
-    let newGeoJsonData = Object.assign({}, APData);
     if (!this.state.showSpaces && this.state.selectedParkingSpaces.length > 0) {
-      // filter out selected curbs
-      newGeoJsonData.features = newGeoJsonData.features.filter((feature) => {
-        return !this.state.selectedCurbs[feature.properties.curbline_id];
-      });
-      // add in selected spaces
-      const selectedSpacesFeatures = AsburyParkSpaces.features.filter((feature) => {
-        return this.state.selectedParkingSpaces.indexOf(feature.properties.spacename) > 0;
+      this.handleShowBanner('Loading spaces can take some time so please wait if you don\'t see anything.', 10000);
+      let heatmapModel = heatmapModelFromState(this.state);
+
+      //api call
+      api(this.state.selectedChartType, 'POST', heatmapModel, {'heatmap': true})
+      .then((response) => {
+        //set state
+        return response.json();
+      })
+      .then((payload) => {
+        const newHeatmapModel = payload.data;
+        // const maxHeatmapValue = newHeatmapModel.reduce((a, b) => {
+        //   if (typeof a === 'object') {
+        //     return Math.max(a.value, b.value);
+        //   } else {
+        //     return Math.max(a, b.value);
+        //   }
+        // }, {value: 0});
+
+        let heatmapValues = newHeatmapModel.map(h => h.value);
+        heatmapValues.sort(function(a, b){return a-b});
+
+        this.setState({
+          // heatmapApiResponseData: payload,
+          heatmapData: newHeatmapModel,
+          heatmapValues,
+          isLoadingHeatmapData: false,
+        }, () => {
+          // filter out selected curbs
+          let newGeoJsonData = Object.assign({}, APData);
+          newGeoJsonData.features = newGeoJsonData.features.filter((feature) => {
+            return !this.state.selectedCurbs[feature.properties.curbline_id];
+          });
+          // add in selected spaces
+          let selectedSpacesFeatures = AsburyParkSpaces.features.filter((feature) => {
+            return this.state.selectedParkingSpaces.indexOf(feature.properties.spacename) > 0;
+          });
+
+          if (selectedSpacesFeatures.length < 1) {
+            this.handleShowBanner('Whoops, couldn\'t find any associated spaces for the curb/curbs you selected. ' +
+            'Select some new curbs and try again?');
+            return;
+          }
+
+          // modify selected spaces to include heatmap value
+          selectedSpacesFeatures = selectedSpacesFeatures.map((feature) => {
+            const matched = this.state.heatmapData.find((element) => {
+              return element.space === feature.properties.spacename;
+            });
+
+            if (matched) {
+              let newFeature = feature;
+              newFeature.properties.heatmapValue = matched.value;
+              return newFeature;
+            }
+            return feature;
+          });
+
+          newGeoJsonData.features = newGeoJsonData.features.concat(selectedSpacesFeatures);
+          // change geojsonData state
+          this.setState({
+            geojsonData: newGeoJsonData,
+            showSpaces: !this.state.showSpaces
+          });
+        });
       });
 
-      if (selectedSpacesFeatures.length < 1) {
-        this.handleShowBanner('Whoops, couldn\'t find any associated spaces for the curb/curbs you selected. ' +
-        'Select some new curbs and try again?');
-        return;
-      }
-
-      newGeoJsonData.features = newGeoJsonData.features.concat(selectedSpacesFeatures);
     }
-    // change geojsonData state
-    this.setState({
-      geojsonData: newGeoJsonData,
-      showSpaces: !this.state.showSpaces
-    });
   }
 
   handleCurbSelected(curb) {
@@ -247,44 +416,77 @@ class App extends Component {
     this.setState({
       selectedCurbs: newSelectedCurbs,
       selectedParkingSpaces: newSelectedParkingSpaces,
+    },
+    () => {
+      //TODO - UNCOMMENT
+      //get api model
+      let chartModel = chartModelFromState(this.state);
+
+      //api call
+      api(this.state.selectedChartType, 'POST', chartModel)
+      .then((response) => {
+        //set state
+        return response.json();
+      })
+      .then((payload) => {
+        let newChartData = chartModelToState(payload.data);
+        this.setState({
+          chartApiResponseData: payload,
+          chartData: newChartData,
+          isLoadingChartData: false,
+        });
+      })
+      .catch((e) => {
+      });
     });
   }
 
   handleChartTypeChanged(chartTypeIndex) {
+    if (this.state.showSpaces) {
+      this.handleToggleShowSpaces();
+    }
     this.setState({
         selectedChartType: ChartTypes[chartTypeIndex],
         isLoadingChartData: true,
-        chartData: {},
+        chartData: [],
+        showHeatmap: false,
+        heatmapData: [],
       },
       () => {
-        // //get api model
-        // let chartModel = chartModelFromState(this.state);
-        //
-        // //api call
-        // api(this.state.selectedChartType, 'POST', chartModel)
-        // .then((response) => {
-        //   //set state
-        //   return response.json();
-        // })
-        // .then((payload) => {
-        //   let newChartData = chartModelToState(payload.data);
-        //   this.setState({
-        //     chartApiResponseData: payload,
-        //     chartData: newChartData,
-        //     isLoadingChartData: false,
-        //   });
-        // })
-        // .catch((e) => {
-        // });
+        //TODO - UNCOMMENT
+        //get api model
+        let chartModel = chartModelFromState(this.state);
+
+        //api call
+        api(this.state.selectedChartType, 'POST', chartModel)
+        .then((response) => {
+          //set state
+          return response.json();
+        })
+        .then((payload) => {
+          let newChartData = chartModelToState(payload.data);
+          this.setState({
+            chartApiResponseData: payload,
+            chartData: newChartData,
+            isLoadingChartData: false,
+          });
+        })
+        .catch((e) => {
+        });
       }
     );
   }
 
   handleChartStartDateChanged(date) {
+    if (this.state.showSpaces) {
+      this.handleToggleShowSpaces();
+    }
     this.setState({
       startDate: date,
       isLoadingChartData: true,
       chartData: {},
+      showHeatmap: false,
+      heatmapData: [],
     },
     () => {
       //get api model
@@ -310,10 +512,15 @@ class App extends Component {
   }
 
   handleChartEndDateChanged(date) {
+    if (this.state.showSpaces) {
+      this.handleToggleShowSpaces();
+    }
     this.setState({
       endDate: date,
       isLoadingChartData: true,
       chartData: {},
+      showHeatmap: false,
+      heatmapData: [],
     },
     () => {
       //get api model
@@ -368,8 +575,13 @@ class App extends Component {
           handleSelectAllCurbs={this.handleSelectAllCurbs}
           handleToggleShowSpaces={this.handleToggleShowSpaces}
           showSpaces={this.state.showSpaces}
+          showHeatmap={this.state.showHeatmap}
+          heatmapData={this.state.heatmapData}
+          isLoadingHeatmapData={this.state.isLoadingHeatmapData}
+          heatmapValues={this.state.heatmapValues}
         />
         <ChartPanel
+          showSpaces={this.state.showSpaces}
           selectedParkingSpaces={this.state.selectedParkingSpaces}
           chartData={this.state.chartData}
           selectedChartType={this.state.selectedChartType}
@@ -381,6 +593,8 @@ class App extends Component {
           handleChartEndDateChanged={this.handleChartEndDateChanged}
           chartList={this.state.chartList}
           handleChartSaved={this.handleChartSaved}
+          handleShowHeatMap={this.handleShowHeatMap}
+          showHeatmap={this.state.showHeatmap}
         />
       </div>
     );

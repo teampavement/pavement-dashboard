@@ -16,14 +16,7 @@ class ChartPanel extends Component {
 
   render() {
     return (
-      <ExpanderPanel className='PV-Chart-Panel' hasPadding={false} style={{
-        zIndex: 400,
-        position: 'absolute',
-        top: 90,
-        right: 10,
-        maxHeight: '80vh',
-        borderColor: '#4A4A4A'
-      }}>
+      <ExpanderPanel className='PV-Chart-Panel' hasPadding={false}>
         <ExpanderPanel.Header>Chart Builder — {ChartTitles[this.props.selectedChartType]}</ExpanderPanel.Header>
           <ChartBuilder
             selectedParkingSpaces={this.props.selectedParkingSpaces}
@@ -36,6 +29,9 @@ class ChartPanel extends Component {
             endDate={this.props.endDate}
             isLoadingChartData={this.props.isLoadingChartData}
             handleChartSaved={this.props.handleChartSaved}
+            handleShowHeatMap={this.props.handleShowHeatMap}
+            showHeatmap={this.props.showHeatmap}
+            showSpaces={this.props.showSpaces}
           />
           {/* <hr />
           <ChartList
