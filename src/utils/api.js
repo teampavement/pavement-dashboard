@@ -1,6 +1,6 @@
 // import fetch from 'isomorphic-fetch'
 
-const API_URL = `http://127.0.0.1:5000`;
+const API_URL = `http://162.243.24.164`;
 
 const paramStringBuilder = (obj) => {
   let output = '';
