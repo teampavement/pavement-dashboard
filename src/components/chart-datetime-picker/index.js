@@ -17,23 +17,31 @@ class ChartDateTimePicker extends Component {
         <div>
           <span>From</span>
           <DatePicker
+            ref={this.startPicker}
             selected={this.props.startDate}
             selectsStart
             startDate={this.props.startDate}
             endDate={this.props.endDate}
             onChange={this.props.handleChartStartDateChanged}
-          />
+            withPortal
+          >
+            <div className="PV-Date-Time-Picker-Subtitle">Select the beginning of the date range</div>
+          </DatePicker>
 
         </div>
         <div>
           <span>To</span>
           <DatePicker
+            ref={this.endPicker}
             selected={this.props.endDate}
             selectsEnd
             startDate={this.props.startDate}
             endDate={this.props.endDate}
             onChange={this.props.handleChartEndDateChanged}
-          />
+            withPortal
+          >
+            <div className="PV-Date-Time-Picker-Subtitle">Select the end of the date range</div>
+          </DatePicker>
         </div>
 
         {/* <ButtonGroup>

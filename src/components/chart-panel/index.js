@@ -17,7 +17,12 @@ class ChartPanel extends Component {
   render() {
     return (
       <ExpanderPanel className='PV-Chart-Panel' hasPadding={false}>
-        <ExpanderPanel.Header>Chart Builder — {ChartTitles[this.props.selectedChartType]}</ExpanderPanel.Header>
+        <ExpanderPanel.Header>
+          Chart
+          {this.props.selectedChartType &&
+            <span> ({ChartTitles[this.props.selectedChartType]})</span>
+          }
+        </ExpanderPanel.Header>
           <ChartBuilder
             selectedParkingSpaces={this.props.selectedParkingSpaces}
             chartData={this.props.chartData}
@@ -25,6 +30,7 @@ class ChartPanel extends Component {
             handleChartTypeChanged={this.props.handleChartTypeChanged}
             handleChartStartDateChanged={this.props.handleChartStartDateChanged}
             handleChartEndDateChanged={this.props.handleChartEndDateChanged}
+            handleCreateChart={this.props.handleCreateChart}
             startDate={this.props.startDate}
             endDate={this.props.endDate}
             isLoadingChartData={this.props.isLoadingChartData}

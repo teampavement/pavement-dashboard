@@ -4,7 +4,7 @@ import moment from 'moment';
 import L from 'leaflet';
 import booleanContains from '@turf/boolean-contains';
 
-import api from './utils/api';
+import api, { abortController } from './utils/api';
 import {chartModelFromState, chartModelToState} from './models/chart';
 import {heatmapModelFromState, heatmapModelToState} from './models/heatmap';
 
@@ -43,14 +43,15 @@ class App extends Component {
     this._handleDrawStop = this._handleDrawStop.bind(this);
     this.handleChartSaved = this.handleChartSaved.bind(this);
     this.handleCurbSelected = this.handleCurbSelected.bind(this);
-    this.handleSelectAllCurbs = this.handleSelectAllCurbs.bind(this);
+    this.handleToggleAllCurbs = this.handleToggleAllCurbs.bind(this);
     this.handleToggleShowSpaces = this.handleToggleShowSpaces.bind(this);
     this.handleShowHeatMap = this.handleShowHeatMap.bind(this);
+    this.handleCreateChart = this.handleCreateChart.bind(this);
     // this._getHeatmapIntensityForSpace = this._getHeatmapIntensityForSpace.bind(this);
     this.state = {
       selectedChartType: ChartTypes[0],
-      selectedParkingSpaces: allSpaces,
-      selectedCurbs: allCurbs,
+      selectedParkingSpaces: [], //allSpaces,
+      selectedCurbs: [], //allCurbs,
       maxCurbCount: Object.keys(allCurbs).length,
       geojsonData: APData,
       showSpaces: false,
@@ -61,9 +62,9 @@ class App extends Component {
       heatmapData: [],
       heatmapApiResponseData: null,
       showHeatmap: false,
-      startDate: moment('2017-8-1 09:00:00'),
-      endDate: moment('2017-8-2 02:00:00'),
-      isLoadingChartData: true,
+      startDate: moment('2017-08-01 09:00:00'),
+      endDate: moment('2017-08-02 02:00:00'),
+      isLoadingChartData: false,
       isLoadingHeatmapData: false,
       chartList: [],
       showBanner: false,
@@ -129,24 +130,24 @@ class App extends Component {
 
   componentDidMount() {
     //get api model
-    let chartModel = chartModelFromState(this.state);
+    // let chartModel = chartModelFromState(this.state);
 
     //api call
-    api(this.state.selectedChartType, 'POST', chartModel)
-    .then((response) => {
-      //set state
-      return response.json();
-    })
-    .then((payload) => {
-      let newChartData = chartModelToState(payload.data);
-      this.setState({
-        chartApiResponseData: payload,
-        chartData: newChartData,
-        isLoadingChartData: false,
-      });
-    })
-    .catch((e) => {
-    });
+    // api(this.state.selectedChartType, 'POST', chartModel)
+    // .then((response) => {
+    //   //set state
+    //   return response.json();
+    // })
+    // .then((payload) => {
+    //   let newChartData = chartModelToState(payload.data);
+    //   this.setState({
+    //     chartApiResponseData: payload,
+    //     chartData: newChartData,
+    //     isLoadingChartData: false,
+    //   });
+    // })
+    // .catch((e) => {
+    // });
   }
   // FOR USE WITH HEATMAP LAYER
   // handleShowHeatMap() {
@@ -194,6 +195,36 @@ class App extends Component {
   //     }
   //   );
   // }
+
+  handleCreateChart() {
+    this.setState({
+      isLoadingChartData: true,
+    },
+    () => {
+      let chartModel = chartModelFromState(this.state);
+
+      //api call
+      api(this.state.selectedChartType, 'POST', chartModel, undefined)
+      .then((response) => {
+        //set state
+        return response.json();
+      })
+      .then((payload) => {
+        let newChartData = chartModelToState(payload.data);
+        this.setState({
+          chartApiResponseData: payload,
+          chartData: newChartData,
+          isLoadingChartData: false,
+        });
+      })
+      .catch((e) => {
+        this.setState({
+          chartData: [],
+          isLoadingChartData: false,
+        });
+      });
+    });
+  }
 
   handleShowHeatMap() {
     if (this.state.showHeatmap) {
@@ -287,17 +318,32 @@ class App extends Component {
     }, duration);
   }
 
-  handleSelectAllCurbs() {
+  handleToggleAllCurbs() {
     if (this.state.showSpaces) {
       // noop if viewing spaces
       return;
     }
 
-    this.setState({
-      selectedParkingSpaces: allSpaces,
-      selectedCurbs: allCurbs,
-      maxCurbCount: Object.keys(allCurbs).length,
-    });
+    if (abortController !== undefined) {
+      abortController.abort();
+    }
+
+    if (this.state.selectedCurbs === allCurbs) {
+      // select none
+      this.setState({
+        chartData: [],
+        selectedParkingSpaces: [],
+        selectedCurbs: [],
+        maxCurbCount: 0,
+      });
+    } else {
+      this.setState({
+        chartData: [],
+        selectedParkingSpaces: allSpaces,
+        selectedCurbs: allCurbs,
+        maxCurbCount: Object.keys(allCurbs).length,
+      });
+    }
   }
 
   handleToggleShowSpaces() {
@@ -313,7 +359,7 @@ class App extends Component {
     }
 
     if (!this.state.showSpaces && this.state.selectedParkingSpaces.length > 0) {
-      this.handleShowBanner('Loading spaces can take some time so please wait if you don\'t see anything.', 10000);
+      // this.handleShowBanner('Loading spaces can take some time so please wait if you don\'t see anything.');
       let heatmapModel = heatmapModelFromState(this.state);
 
       //api call
@@ -413,31 +459,16 @@ class App extends Component {
         newSelectedParkingSpaces = [].concat(newSelectedParkingSpaces, feature.properties.spaces);
       }
     });
+
+    if (abortController !== undefined) {
+      abortController.abort();
+    }
+
     this.setState({
       selectedCurbs: newSelectedCurbs,
       selectedParkingSpaces: newSelectedParkingSpaces,
-    },
-    () => {
-      //TODO - UNCOMMENT
-      //get api model
-      let chartModel = chartModelFromState(this.state);
-
-      //api call
-      api(this.state.selectedChartType, 'POST', chartModel)
-      .then((response) => {
-        //set state
-        return response.json();
-      })
-      .then((payload) => {
-        let newChartData = chartModelToState(payload.data);
-        this.setState({
-          chartApiResponseData: payload,
-          chartData: newChartData,
-          isLoadingChartData: false,
-        });
-      })
-      .catch((e) => {
-      });
+      chartData: [],
+      heatmapData: [],
     });
   }
 
@@ -445,104 +476,69 @@ class App extends Component {
     if (this.state.showSpaces) {
       this.handleToggleShowSpaces();
     }
+    if (abortController !== undefined) {
+      abortController.abort();
+    }
     this.setState({
-        selectedChartType: ChartTypes[chartTypeIndex],
-        isLoadingChartData: true,
-        chartData: [],
-        showHeatmap: false,
-        heatmapData: [],
-      },
-      () => {
-        //TODO - UNCOMMENT
-        //get api model
-        let chartModel = chartModelFromState(this.state);
-
-        //api call
-        api(this.state.selectedChartType, 'POST', chartModel)
-        .then((response) => {
-          //set state
-          return response.json();
-        })
-        .then((payload) => {
-          let newChartData = chartModelToState(payload.data);
-          this.setState({
-            chartApiResponseData: payload,
-            chartData: newChartData,
-            isLoadingChartData: false,
-          });
-        })
-        .catch((e) => {
-        });
-      }
-    );
+      selectedChartType: ChartTypes[chartTypeIndex],
+      chartData: [],
+      showHeatmap: false,
+      heatmapData: [],
+    });
   }
 
   handleChartStartDateChanged(date) {
     if (this.state.showSpaces) {
       this.handleToggleShowSpaces();
     }
-    this.setState({
-      startDate: date,
-      isLoadingChartData: true,
-      chartData: {},
-      showHeatmap: false,
-      heatmapData: [],
-    },
-    () => {
-      //get api model
-      let chartModel = chartModelFromState(this.state);
+    if (abortController !== undefined) {
+      abortController.abort();
+    }
 
-      //api call
-      api(this.state.selectedChartType, 'POST', chartModel)
-      .then((response) => {
-        //set state
-        return response.json();
-      })
-      .then((payload) => {
-        let newChartData = chartModelToState(payload.data);
-        this.setState({
-          chartApiResponseData: payload,
-          chartData: newChartData,
-          isLoadingChartData: false,
-        });
-      })
-      .catch((e) => {
+    if (date > this.state.endDate) {
+      // delete endDate
+      this.setState({
+        startDate: date,
+        endDate: null,
+        chartData: [],
+        showHeatmap: false,
+        heatmapData: [],
       });
-    });
+    } else {
+      this.setState({
+        startDate: date,
+        chartData: [],
+        showHeatmap: false,
+        heatmapData: [],
+      });
+    }
   }
 
   handleChartEndDateChanged(date) {
     if (this.state.showSpaces) {
       this.handleToggleShowSpaces();
     }
-    this.setState({
-      endDate: date,
-      isLoadingChartData: true,
-      chartData: {},
-      showHeatmap: false,
-      heatmapData: [],
-    },
-    () => {
-      //get api model
-      let chartModel = chartModelFromState(this.state);
+    if (abortController !== undefined) {
+      abortController.abort();
+    }
 
-      //api call
-      api(this.state.selectedChartType, 'POST', chartModel)
-      .then((response) => {
-        //set state
-        return response.json();
-      })
-      .then((payload) => {
-        let newChartData = chartModelToState(payload.data);
-        this.setState({
-          chartApiResponseData: payload,
-          chartData: newChartData,
-          isLoadingChartData: false,
-        });
-      })
-      .catch((e) => {
+    if (date < this.state.startDate) {
+      this.setState({
+        startDate: null,
+        endDate: date,
+        chartData: [],
+        showHeatmap: false,
+        heatmapData: [],
       });
-    });
+    } else {
+      this.setState({
+        endDate: date,
+        chartData: [],
+        showHeatmap: false,
+        heatmapData: [],
+      });
+    }
+
   }
 
   handleChartSaved() {
@@ -572,25 +568,28 @@ class App extends Component {
           selectedParkingSpaces={this.state.selectedParkingSpaces}
           handleDrawStop={this._handleDrawStop}
           handleCurbSelected={this.handleCurbSelected}
-          handleSelectAllCurbs={this.handleSelectAllCurbs}
+          handleToggleAllCurbs={this.handleToggleAllCurbs}
+          allCurbsSelected={this.state.selectedCurbs === allCurbs}
           handleToggleShowSpaces={this.handleToggleShowSpaces}
           showSpaces={this.state.showSpaces}
           showHeatmap={this.state.showHeatmap}
           heatmapData={this.state.heatmapData}
           isLoadingHeatmapData={this.state.isLoadingHeatmapData}
           heatmapValues={this.state.heatmapValues}
+          handleChartTypeChanged={this.handleChartTypeChanged}
+          selectedChartType={this.state.selectedChartType}
+          startDate={this.state.startDate}
+          endDate={this.state.endDate}
+          handleChartStartDateChanged={this.handleChartStartDateChanged}
+          handleChartEndDateChanged={this.handleChartEndDateChanged}
         />
         <ChartPanel
           showSpaces={this.state.showSpaces}
           selectedParkingSpaces={this.state.selectedParkingSpaces}
           chartData={this.state.chartData}
           selectedChartType={this.state.selectedChartType}
-          handleChartTypeChanged={this.handleChartTypeChanged}
-          startDate={this.state.startDate}
-          endDate={this.state.endDate}
           isLoadingChartData={this.state.isLoadingChartData}
-          handleChartStartDateChanged={this.handleChartStartDateChanged}
-          handleChartEndDateChanged={this.handleChartEndDateChanged}
+          handleCreateChart={this.handleCreateChart}
           chartList={this.state.chartList}
           handleChartSaved={this.handleChartSaved}
           handleShowHeatMap={this.handleShowHeatMap}

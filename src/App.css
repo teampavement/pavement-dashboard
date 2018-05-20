@@ -89,9 +89,7 @@ body {
 
 .PV-Map-Control-Button.lucid-Button {
   /* border-color: #FFF; */
-  font-size: 18px;
   background-image: linear-gradient(#FFFFFA,#EBE9E9);
-  width: 160px;
   border-color: #4A4A4A;
 }
 
@@ -155,8 +153,10 @@ body {
   justify-content: space-around;
 }
 
-.PV-Chart-Date-Time-Picker-Half {
-
+.PV-Date-Time-Picker-Subtitle {
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
 }
 
 .PV-Chart-Date-Picker {
@@ -208,4 +208,8 @@ body {
   padding-top: 20px;
   margin: 0;
   top: 10px;
+}
+
+.PV-Chart-Tools {
+  background: white;
 }
