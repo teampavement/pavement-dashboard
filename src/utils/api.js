@@ -1,7 +1,7 @@
 // import fetch from 'isomorphic-fetch'
 
-// const API_URL = `http://162.243.24.164`;
-const API_URL = `http://localhost:5000`;
+const API_URL = `http://162.243.24.164`;
+// const API_URL = `http://localhost:5000`;
 export let abortController;
 let signal;
 let prevEndpoint, prevBody, prevQueryParams;

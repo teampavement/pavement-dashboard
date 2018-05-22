@@ -20,10 +20,14 @@ class ChartPanel extends Component {
         <ExpanderPanel.Header>
           Chart
           {this.props.selectedChartType &&
-            <span> ({ChartTitles[this.props.selectedChartType]})</span>
+            <span> - {ChartTitles[this.props.selectedChartType]}</span>
+          }
+          {this.props.selectedDay &&
+            <span> - Average {this.props.selectedDay}</span>
           }
         </ExpanderPanel.Header>
           <ChartBuilder
+            selectedDay={this.props.selectedDay}
             selectedParkingSpaces={this.props.selectedParkingSpaces}
             chartData={this.props.chartData}
             selectedChartType={this.props.selectedChartType}
@@ -38,6 +42,8 @@ class ChartPanel extends Component {
             handleShowHeatMap={this.props.handleShowHeatMap}
             showHeatmap={this.props.showHeatmap}
             showSpaces={this.props.showSpaces}
+            handleDownloadChart={this.props.handleDownloadChart}
+            handleSetChartRef={this.props.handleSetChartRef}
           />
           {/* <hr />
           <ChartList

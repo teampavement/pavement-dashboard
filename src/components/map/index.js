@@ -31,6 +31,7 @@ import {
   getLongitudeFromCurb
 } from '../../utils/heatmap';
 import ChartChooser from '../chart-chooser';
+import DayChooser from '../day-chooser';
 import ChartDateTimePicker from '../chart-datetime-picker';
 
 // import GeoJsonCluster from 'react-leaflet-geojson-cluster';
@@ -217,10 +218,14 @@ class MapComponent extends Component {
               handleChartStartDateChanged={this.props.handleChartStartDateChanged}
               handleChartEndDateChanged={this.props.handleChartEndDateChanged}
             />
+            <DayChooser
+              selectedDay={this.props.selectedDay}
+              handleDayChanged={this.props.handleDayChanged}
+            />
           </Panel>
         </Control>
         <FeatureGroup>
-          <EditControl
+          {/* <EditControl
             position='topleft'
             onEdited={this._onEditPath}
             onCreated={this._onCreate}
@@ -231,12 +236,12 @@ class MapComponent extends Component {
               circlemarker: false,
             }}
             onDrawStop={this.props.handleDrawStop}
-          />
+          /> */}
           <PrintControl filename={'Pavement Export'} ref={(ref) => { this.printControl = ref; }} position="topleft" sizeModes={['Current', 'A4Portrait', 'A4Landscape']} hideControlContainer={false} />
           <PrintControl filename={'Pavement Export'} position="topleft" sizeModes={['Current', 'A4Portrait', 'A4Landscape']} hideControlContainer={false} title="Export as PNG" exportOnly />
         </FeatureGroup>
           {/* <Circle center={[51.51, -0.06]} radius={200} /> */}
-        {this.props.showHeatmap &&
+        {/* {this.props.showHeatmap &&
           <LoadingIndicator isLoading={this.props.isLoadingHeatmapData} >
             <HeatmapLayer
               max={this.props.maxHeatmapValue}
@@ -247,7 +252,7 @@ class MapComponent extends Component {
               longitudeExtractor={m => m[1]}
               intensityExtractor={m => m[2]} />
           </LoadingIndicator>
-          }
+          } */}
       </Map>
     );
   }

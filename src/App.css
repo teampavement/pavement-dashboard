@@ -109,7 +109,7 @@ body {
 }
 
 .PV-Chart-Builder {
-  width: 750px;
+  width: 900px;
 }
 
 @media screen and (max-width: 1024px) {
@@ -190,6 +190,7 @@ body {
 .PV-Chart-Footer-Left-Button > .lucid-Button,
 .PV-Chart-Footer-Left-Button > .lucid-Button.lucid-Button-is-active
  {
+  width: 100%;
   background-color: #F5E0B7;
   border-color: #4A4A4A;
   color: #4A4A4A;

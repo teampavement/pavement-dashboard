@@ -5,6 +5,7 @@ import L from 'leaflet';
 import booleanContains from '@turf/boolean-contains';
 
 import api, { abortController } from './utils/api';
+import DownloadChart from './utils/download-chart';
 import {chartModelFromState, chartModelToState} from './models/chart';
 import {heatmapModelFromState, heatmapModelToState} from './models/heatmap';
 
@@ -16,6 +17,7 @@ import ChartPanel from './components/chart-panel';
 import {AsburyPark} from './constants/asbury-park';
 import {AsburyParkSpaces} from './constants/asbury-park-spaces';
 import {ChartTypes} from './constants/chart-types';
+import Days from './constants/days';
 import initialOccupancy from './constants/initial-occupancy';
 
 const segments = [
@@ -47,6 +49,7 @@ class App extends Component {
     this.handleToggleShowSpaces = this.handleToggleShowSpaces.bind(this);
     this.handleShowHeatMap = this.handleShowHeatMap.bind(this);
     this.handleCreateChart = this.handleCreateChart.bind(this);
+    this.handleDayChanged = this.handleDayChanged.bind(this);
     // this._getHeatmapIntensityForSpace = this._getHeatmapIntensityForSpace.bind(this);
     this.state = {
       selectedChartType: ChartTypes[0],
@@ -69,6 +72,8 @@ class App extends Component {
       chartList: [],
       showBanner: false,
       bannerMessage: '',
+      chartRef: null,
+      selectedDay: null,
     }
   }
 
@@ -202,15 +207,17 @@ class App extends Component {
     },
     () => {
       let chartModel = chartModelFromState(this.state);
-
+      let queryParams = this.state.selectedDay ?
+        {'day': this.state.selectedDay}
+        : undefined;
       //api call
-      api(this.state.selectedChartType, 'POST', chartModel, undefined)
+      api(this.state.selectedChartType, 'POST', chartModel, queryParams)
       .then((response) => {
         //set state
         return response.json();
       })
       .then((payload) => {
-        let newChartData = chartModelToState(payload.data);
+        let newChartData = chartModelToState(payload.data, queryParams);
         this.setState({
           chartApiResponseData: payload,
           chartData: newChartData,
@@ -487,6 +494,18 @@ class App extends Component {
     });
   }
 
+  handleDayChanged(day) {
+    if (abortController !== undefined) {
+      abortController.abort();
+    }
+    this.setState({
+      selectedDay: Days[day],
+      chartData: [],
+      showHeatmap: false,
+      heatmapData: [],
+    });
+  }
+
   handleChartStartDateChanged(date) {
     if (this.state.showSpaces) {
       this.handleToggleShowSpaces();
@@ -554,6 +573,17 @@ class App extends Component {
     });
   }
 
+  handleDownloadChart = () => {
+    DownloadChart(this.state.chartRef, "Pavement_Exported_Chart");
+    return;
+  }
+
+  handleSetChartRef = (chartRef) => {
+    this.setState({
+      chartRef: chartRef,
+    });
+  }
+
   render() {
     return (
       <div className="PV-Container">
@@ -582,9 +612,14 @@ class App extends Component {
           endDate={this.state.endDate}
           handleChartStartDateChanged={this.handleChartStartDateChanged}
           handleChartEndDateChanged={this.handleChartEndDateChanged}
+          selectedDay={this.props.selectedDay}
+          handleDayChanged={this.handleDayChanged}
         />
         <ChartPanel
           showSpaces={this.state.showSpaces}
+          selectedDay={this.state.selectedDay}
+          handleDownloadChart={this.handleDownloadChart}
+          handleSetChartRef={this.handleSetChartRef}
           selectedParkingSpaces={this.state.selectedParkingSpaces}
           chartData={this.state.chartData}
           selectedChartType={this.state.selectedChartType}

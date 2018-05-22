@@ -26,6 +26,7 @@ class ChartDateTimePicker extends Component {
             withPortal
           >
             <div className="PV-Date-Time-Picker-Subtitle">Select the beginning of the date range</div>
+            <div className="PV-Date-Time-Picker-Subtitle">(Press escape to close)</div>
           </DatePicker>
 
         </div>
@@ -41,6 +42,7 @@ class ChartDateTimePicker extends Component {
             withPortal
           >
             <div className="PV-Date-Time-Picker-Subtitle">Select the end of the date range</div>
+            <div className="PV-Date-Time-Picker-Subtitle">(Press escape to close)</div>
           </DatePicker>
         </div>
 
