@@ -21,3 +21,9 @@ export const ChartTitles = {
   'parking-revenue': 'Revenue',
   'parking-time': 'Time',
 }
+
+export const ChartUnits = {
+  'parking-occupancy': 'percent',
+  'parking-revenue': 'dollars',
+  'parking-time': 'hours',
+}

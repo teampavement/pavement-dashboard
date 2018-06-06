@@ -8,6 +8,7 @@ import api, { abortController } from './utils/api';
 import DownloadChart from './utils/download-chart';
 import {chartModelFromState, chartModelToState} from './models/chart';
 import {heatmapModelFromState, heatmapModelToState} from './models/heatmap';
+import {spaceModelFromState, spaceModelToState} from './models/space';
 
 import MapComponent from './components/map';
 import Alert from './components/alert';
@@ -58,6 +59,9 @@ class App extends Component {
       maxCurbCount: Object.keys(allCurbs).length,
       geojsonData: APData,
       showSpaces: false,
+      spaceHovered: null,
+      spaceRevenue: null,
+      isLoadingSpaceRevenue: false,
       // chartData: chartModelToState(initialOccupancy.data),
       // chartApiResponseData: initialOccupancy,
       chartData: [],
@@ -366,74 +370,80 @@ class App extends Component {
     }
 
     if (!this.state.showSpaces && this.state.selectedParkingSpaces.length > 0) {
-      // this.handleShowBanner('Loading spaces can take some time so please wait if you don\'t see anything.');
-      let heatmapModel = heatmapModelFromState(this.state);
+      this.setState({
+        isLoadingHeatmapData: true,
+      },
+        () => {
+          // this.handleShowBanner('Loading spaces can take some time so please wait if you don\'t see anything.');
+          let heatmapModel = heatmapModelFromState(this.state);
 
-      //api call
-      api(this.state.selectedChartType, 'POST', heatmapModel, {'heatmap': true})
-      .then((response) => {
-        //set state
-        return response.json();
-      })
-      .then((payload) => {
-        const newHeatmapModel = payload.data;
-        // const maxHeatmapValue = newHeatmapModel.reduce((a, b) => {
-        //   if (typeof a === 'object') {
-        //     return Math.max(a.value, b.value);
-        //   } else {
-        //     return Math.max(a, b.value);
-        //   }
-        // }, {value: 0});
+          //api call
+          api(this.state.selectedChartType, 'POST', heatmapModel, {'heatmap': true})
+          .then((response) => {
+            //set state
+            return response.json();
+          })
+          .then((payload) => {
+            const newHeatmapModel = payload.data;
+            // const maxHeatmapValue = newHeatmapModel.reduce((a, b) => {
+            //   if (typeof a === 'object') {
+            //     return Math.max(a.value, b.value);
+            //   } else {
+            //     return Math.max(a, b.value);
+            //   }
+            // }, {value: 0});
 
-        let heatmapValues = newHeatmapModel.map(h => h.value);
-        heatmapValues.sort(function(a, b){return a-b});
+            let heatmapValues = newHeatmapModel.map(h => h.value);
+            heatmapValues.sort(function(a, b){return a-b});
 
-        this.setState({
-          // heatmapApiResponseData: payload,
-          heatmapData: newHeatmapModel,
-          heatmapValues,
-          isLoadingHeatmapData: false,
-        }, () => {
-          // filter out selected curbs
-          let newGeoJsonData = Object.assign({}, APData);
-          newGeoJsonData.features = newGeoJsonData.features.filter((feature) => {
-            return !this.state.selectedCurbs[feature.properties.curbline_id];
-          });
-          // add in selected spaces
-          let selectedSpacesFeatures = AsburyParkSpaces.features.filter((feature) => {
-            return this.state.selectedParkingSpaces.indexOf(feature.properties.spacename) > 0;
-          });
+            this.setState({
+              // heatmapApiResponseData: payload,
+              heatmapData: newHeatmapModel,
+              heatmapValues,
+              isLoadingHeatmapData: false,
+            }, () => {
+              // filter out selected curbs
+              let newGeoJsonData = Object.assign({}, APData);
+              newGeoJsonData.features = newGeoJsonData.features.filter((feature) => {
+                return !this.state.selectedCurbs[feature.properties.curbline_id];
+              });
+              // add in selected spaces
+              let selectedSpacesFeatures = AsburyParkSpaces.features.filter((feature) => {
+                return this.state.selectedParkingSpaces.indexOf(feature.properties.spacename) > 0;
+              });
 
-          if (selectedSpacesFeatures.length < 1) {
-            this.handleShowBanner('Whoops, couldn\'t find any associated spaces for the curb/curbs you selected. ' +
-            'Select some new curbs and try again?');
-            return;
-          }
+              if (selectedSpacesFeatures.length < 1) {
+                this.handleShowBanner('Whoops, couldn\'t find any associated spaces for the curb/curbs you selected. ' +
+                'Select some new curbs and try again?');
+                return;
+              }
 
-          // modify selected spaces to include heatmap value
-          selectedSpacesFeatures = selectedSpacesFeatures.map((feature) => {
-            const matched = this.state.heatmapData.find((element) => {
-              return element.space === feature.properties.spacename;
+              // modify selected spaces to include heatmap value
+              selectedSpacesFeatures = selectedSpacesFeatures.map((feature) => {
+                const matched = this.state.heatmapData.find((element) => {
+                  return element.space === feature.properties.spacename;
+                });
+
+                if (matched) {
+                  let newFeature = feature;
+                  newFeature.properties.heatmapValue = matched.value;
+                  return newFeature;
+                }
+                return feature;
+              });
+
+              newGeoJsonData.features = newGeoJsonData.features.concat(selectedSpacesFeatures);
+              // change geojsonData state
+              this.setState({
+                geojsonData: newGeoJsonData,
+                showSpaces: !this.state.showSpaces
+              });
             });
-
-            if (matched) {
-              let newFeature = feature;
-              newFeature.properties.heatmapValue = matched.value;
-              return newFeature;
-            }
-            return feature;
           });
-
-          newGeoJsonData.features = newGeoJsonData.features.concat(selectedSpacesFeatures);
-          // change geojsonData state
-          this.setState({
-            geojsonData: newGeoJsonData,
-            showSpaces: !this.state.showSpaces
-          });
-        });
-      });
-
+        }
+      );
     }
+
   }
 
   handleCurbSelected(curb) {
@@ -584,6 +594,50 @@ class App extends Component {
     });
   }
 
+  handleSpaceMouseover = (spacename) => {
+    this.setState({
+      spaceHovered: spacename,
+      isLoadingSpaceRevenue: true,
+    },
+      () => {
+        if (abortController !== undefined) {
+          abortController.abort();
+        }
+        setTimeout(() => {
+          // call api
+          let spaceModel = spaceModelFromState(this.state);
+          //api call
+          api(this.state.selectedChartType, 'POST', spaceModel, {'sum': true})
+          .then((response) => {
+            //set state
+            return response.json();
+          })
+          .then((payload) => {
+            let spaceRevenueData = spaceModelToState(payload);
+            this.setState({
+              spaceRevenue: spaceRevenueData.value,
+              isLoadingSpaceRevenue: false,
+            });
+          })
+          .catch((e) => {
+            this.setState({
+              spaceRevenue: null,
+              isLoadingSpaceRevenue: false
+            });
+          });
+        }, 1000)
+      }
+    );
+  }
+
+  handleSpaceMouseout = () => {
+    this.setState({
+      spaceRevenue: null,
+      spaceHovered: null,
+      isLoadingSpaceRevenue: false
+    });
+  }
+
   render() {
     return (
       <div className="PV-Container">
@@ -614,6 +668,12 @@ class App extends Component {
           handleChartEndDateChanged={this.handleChartEndDateChanged}
           selectedDay={this.props.selectedDay}
           handleDayChanged={this.handleDayChanged}
+          handleShowHeatMap={this.handleShowHeatMap}
+          spaceHovered={this.state.spaceHovered}
+          spaceRevenue={this.state.spaceRevenue}
+          isLoadingSpaceRevenue={this.state.isLoadingSpaceRevenue}
+          handleSpaceMouseout={this.handleSpaceMouseout}
+          handleSpaceMouseover={this.handleSpaceMouseover}
         />
         <ChartPanel
           showSpaces={this.state.showSpaces}
@@ -627,7 +687,6 @@ class App extends Component {
           handleCreateChart={this.handleCreateChart}
           chartList={this.state.chartList}
           handleChartSaved={this.handleChartSaved}
-          handleShowHeatMap={this.handleShowHeatMap}
           showHeatmap={this.state.showHeatmap}
         />
       </div>

@@ -44,7 +44,8 @@ class ChartBuilder extends Component {
           <Button
             className='PV-Right-Button'
             onClick={this.props.handleDownloadChart}
-            isDisabled={this.props.chartData.length === 0}>
+            // isDisabled={this.props.chartData.length === 0}>
+            isDisabled={true}>
             Download Chart
           </Button>
           <Button
