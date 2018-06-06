@@ -43,17 +43,17 @@ class ChartBuilder extends Component {
           {/* <button className="PV-Save-Button" onClick={this.props.handleChartSaved}>Add new chart</button> */}
           <Button
             className='PV-Right-Button'
-            onClick={this.props.handleDownloadChart}
-            // isDisabled={this.props.chartData.length === 0}>
-            isDisabled={true}>
-            Download Chart
-          </Button>
-          <Button
-            className='PV-Right-Button'
             kind='primary'
             isDisabled={this.props.isLoadingChartData || this.props.chartData.length !== 0}
             onClick={this.props.handleCreateChart}>
               Generate chart
+          </Button>
+          <Button
+            className='PV-Right-Button'
+            onClick={this.props.handleDownloadChart}
+            // isDisabled={this.props.chartData.length === 0}>
+            isDisabled={true}>
+            Download Chart
           </Button>
         </div>
       </div>
