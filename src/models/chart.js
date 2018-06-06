@@ -1,12 +1,22 @@
 //api => state
-export const chartModelToState = (payload) => {
-  // debugger;
-  return payload.map(datum => {
-    return {
-      timestamp: new Date(datum.timestamp),
-      value: datum.value
-    };
-  });
+export const chartModelToState = (payload, queryParams) => {
+  if (queryParams === undefined) {
+    // assume if no query params, then we're just doing barebones chart
+    return payload.map(datum => {
+      return {
+        timestamp: new Date(datum.timestamp),
+        value: datum.value
+      };
+    });
+  } else {
+    // if have query params at a chart endpoint, assume day-of-week chart
+    return payload.map(datum => {
+      return {
+        timestamp: datum.timestamp.split("-")[0],
+        value: datum.value
+      };
+    });
+  }
 }
 
 //state => api

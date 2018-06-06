@@ -17,14 +17,24 @@ class ChartPanel extends Component {
   render() {
     return (
       <ExpanderPanel className='PV-Chart-Panel' hasPadding={false}>
-        <ExpanderPanel.Header>Chart Builder — {ChartTitles[this.props.selectedChartType]}</ExpanderPanel.Header>
+        <ExpanderPanel.Header>
+          Chart
+          {this.props.selectedChartType &&
+            <span> - {ChartTitles[this.props.selectedChartType]}</span>
+          }
+          {this.props.selectedDay &&
+            <span> - Average {this.props.selectedDay}</span>
+          }
+        </ExpanderPanel.Header>
           <ChartBuilder
+            selectedDay={this.props.selectedDay}
             selectedParkingSpaces={this.props.selectedParkingSpaces}
             chartData={this.props.chartData}
             selectedChartType={this.props.selectedChartType}
             handleChartTypeChanged={this.props.handleChartTypeChanged}
             handleChartStartDateChanged={this.props.handleChartStartDateChanged}
             handleChartEndDateChanged={this.props.handleChartEndDateChanged}
+            handleCreateChart={this.props.handleCreateChart}
             startDate={this.props.startDate}
             endDate={this.props.endDate}
             isLoadingChartData={this.props.isLoadingChartData}
@@ -32,6 +42,8 @@ class ChartPanel extends Component {
             handleShowHeatMap={this.props.handleShowHeatMap}
             showHeatmap={this.props.showHeatmap}
             showSpaces={this.props.showSpaces}
+            handleDownloadChart={this.props.handleDownloadChart}
+            handleSetChartRef={this.props.handleSetChartRef}
           />
           {/* <hr />
           <ChartList

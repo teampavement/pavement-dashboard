@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Resizer, LineChart, Legend, chartConstants, LoadingIndicator } from 'lucid-ui';
+import React, { Component, createRef } from 'react';
+import { Resizer, LineChart, BarChart, Legend, chartConstants, LoadingIndicator } from 'lucid-ui';
 import '../../../node_modules/lucid-ui/dist/index.css';
 
 import COLORS from '../../constants/colors';
@@ -29,6 +29,14 @@ class Chart extends Component {
 		this.yAxisFormatter = this.yAxisFormatter.bind(this);
 	}
 
+	componentDidUpdate = () => {
+		console.log(this.props.children);
+	}
+
+	handleRefCallback = (ref) => {
+		this.props.handleSetChartRef(ref);
+	}
+
 	yAxisFormatter(value) {
 		if (this.props.selectedChartType === ChartTypeMap.PARKING_OCCUPANCY) {
 			return percentFormatter.format(value);
@@ -36,6 +44,38 @@ class Chart extends Component {
 				return currencyFormatter.format(value);
 		}
 		return value;
+	}
+
+	renderChart(width) {
+		if (this.props.selectedDay) {
+			return <BarChart
+				ref={this.handleRefCallback}
+				width={width}
+				height={300}
+				data={this.props.chartData ? this.props.chartData : []}
+				xAxisField={xAxisField}
+				yAxisFields={yAxisFields}
+				yAxisFormatter={this.yAxisFormatter}
+				yAxisTitle={ChartAxes[this.props.selectedChartType]}
+				colorMap={{
+					value: COLORS.BLUE
+				}}
+			/>;
+		} else {
+			return <LineChart
+					ref={this.handleRefCallback}
+					width={width}
+					height={300}
+					data={this.props.chartData ? this.props.chartData : []}
+					xAxisField={xAxisField}
+					yAxisFields={yAxisFields}
+					yAxisFormatter={this.yAxisFormatter}
+					yAxisTitle={ChartAxes[this.props.selectedChartType]}
+					colorMap={{
+						value: COLORS.BLUE
+					}}
+				/>;
+		}
 	}
 
 	render() {
@@ -55,20 +95,7 @@ class Chart extends Component {
 				}
 
 				<Resizer>
-					{(width) => (
-						<LineChart
-							width={width}
-							height={300}
-							data={this.props.chartData ? this.props.chartData : []}
-							xAxisField={xAxisField}
-							yAxisFields={yAxisFields}
-							yAxisFormatter={this.yAxisFormatter}
-							yAxisTitle={ChartAxes[this.props.selectedChartType]}
-							colorMap={{
-								value: COLORS.BLUE
-							}}
-						/>
-				)}
+					{(width) => (this.renderChart(width))}
 				</Resizer>
 
 				{

@@ -1,6 +1,10 @@
 // import fetch from 'isomorphic-fetch'
 
 const API_URL = `http://162.243.24.164`;
+// const API_URL = `http://localhost:5000`;
+export let abortController;
+let signal;
+let prevEndpoint, prevBody, prevQueryParams;
 
 const paramStringBuilder = (obj) => {
   let output = '';
@@ -19,6 +23,11 @@ const getRequestURLBuilder = (API_URL, queryParams) => {
 };
 
 export default (endpoint, method, body, queryParams) => {
+  if ("AbortController" in window) {
+    abortController = new window.AbortController();
+    signal = abortController.signal;
+  }
+
   let url = `${API_URL}/${endpoint}`;
   if (queryParams) {
     url += `?${paramStringBuilder(queryParams)}`;
@@ -26,6 +35,7 @@ export default (endpoint, method, body, queryParams) => {
 
   if (method === 'POST') {
     return fetch(`${url}`, {
+      signal,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

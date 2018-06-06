@@ -89,9 +89,7 @@ body {
 
 .PV-Map-Control-Button.lucid-Button {
   /* border-color: #FFF; */
-  font-size: 18px;
   background-image: linear-gradient(#FFFFFA,#EBE9E9);
-  width: 160px;
   border-color: #4A4A4A;
 }
 
@@ -104,6 +102,11 @@ body {
   border-color: #4A4A4A;
 }
 
+.PV-Heatmap-Legend {
+  text-align: center;
+  max-width: 95px;
+}
+
 .PV-Chart {
   padding-top: 10px;
   padding-bottom: 5px;
@@ -111,7 +114,7 @@ body {
 }
 
 .PV-Chart-Builder {
-  width: 750px;
+  width: 900px;
 }
 
 @media screen and (max-width: 1024px) {
@@ -155,8 +158,10 @@ body {
   justify-content: space-around;
 }
 
-.PV-Chart-Date-Time-Picker-Half {
-
+.PV-Date-Time-Picker-Subtitle {
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
 }
 
 .PV-Chart-Date-Picker {
@@ -190,6 +195,7 @@ body {
 .PV-Chart-Footer-Left-Button > .lucid-Button,
 .PV-Chart-Footer-Left-Button > .lucid-Button.lucid-Button-is-active
  {
+  width: 100%;
   background-color: #F5E0B7;
   border-color: #4A4A4A;
   color: #4A4A4A;
@@ -208,4 +214,8 @@ body {
   padding-top: 20px;
   margin: 0;
   top: 10px;
+}
+
+.PV-Chart-Tools {
+  background: white;
 }
