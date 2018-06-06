@@ -128,11 +128,15 @@ class MapComponent extends Component {
     let circleColor = COLORS.BLUE;
     if (this.props.heatmapValues) {
       // find the right color
-      const len = this.props.heatmapValues.length;
-      const per20 = this.props.heatmapValues[Math.floor(len*.2) - 1];
-      const per40 = this.props.heatmapValues[Math.floor(len*.4) - 1];
-      const per60 = this.props.heatmapValues[Math.floor(len*.6) - 1];
-      const per80 = this.props.heatmapValues[Math.floor(len*.8) - 1];
+      // iterate until first nonzero number
+      // start bucketing from there — all zeroes go in the first bucket
+      const startingPoint = this.props.heatmapValues.findIndex((el) => el > 0);
+      const slicedHeatmapList = this.props.heatmapValues.slice(startingPoint)
+      const len = slicedHeatmapList.length;
+      const per20 = slicedHeatmapList[Math.floor(len*.2) - 1];
+      const per40 = slicedHeatmapList[Math.floor(len*.4) - 1];
+      const per60 = slicedHeatmapList[Math.floor(len*.6) - 1];
+      const per80 = slicedHeatmapList[Math.floor(len*.8) - 1];
 
       if (point.properties.heatmapValue <= per20) {
         circleColor = COLORS.BLUE;
@@ -160,11 +164,13 @@ class MapComponent extends Component {
   renderHeatmapLegend() {
     if (this.props.heatmapValues && this.props.selectedChartType !== ChartTypeMap.PARKING_REVENUE) {
       // find the right color
-      const len = this.props.heatmapValues.length;
-      const per20 = this.props.heatmapValues[Math.floor(len*.2) - 1];
-      const per40 = this.props.heatmapValues[Math.floor(len*.4) - 1];
-      const per60 = this.props.heatmapValues[Math.floor(len*.6) - 1];
-      const per80 = this.props.heatmapValues[Math.floor(len*.8) - 1];
+      const startingPoint = this.props.heatmapValues.findIndex((el) => el > 0);
+      const slicedHeatmapList = this.props.heatmapValues.slice(startingPoint)
+      const len = slicedHeatmapList.length;
+      const per20 = slicedHeatmapList[Math.floor(len*.2) - 1];
+      const per40 = slicedHeatmapList[Math.floor(len*.4) - 1];
+      const per60 = slicedHeatmapList[Math.floor(len*.6) - 1];
+      const per80 = slicedHeatmapList[Math.floor(len*.8) - 1];
 
       return <div className="PV-Heatmap-Legend">
         {ChartAxes[this.props.selectedChartType]}
@@ -192,7 +198,7 @@ class MapComponent extends Component {
         <div style={{
           backgroundColor: COLORS.RED
         }}>
-          {per80}-{this.props.heatmapValues[len-1]}
+          {per80}-{slicedHeatmapList[len-1]}
         </div>
       </div>
     }

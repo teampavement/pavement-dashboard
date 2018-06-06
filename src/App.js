@@ -17,7 +17,7 @@ import ChartPanel from './components/chart-panel';
 
 import {AsburyPark} from './constants/asbury-park';
 import {AsburyParkSpaces} from './constants/asbury-park-spaces';
-import {ChartTypes} from './constants/chart-types';
+import {ChartTypes, ChartTypeMap} from './constants/chart-types';
 import Days from './constants/days';
 import initialOccupancy from './constants/initial-occupancy';
 
@@ -595,6 +595,9 @@ class App extends Component {
   }
 
   handleSpaceMouseover = (spacename) => {
+    if (this.state.selectedChartType !== ChartTypeMap.PARKING_REVENUE) {
+      return;
+    }
     this.setState({
       spaceHovered: spacename,
       isLoadingSpaceRevenue: true,
